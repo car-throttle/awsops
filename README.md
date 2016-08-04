@@ -68,9 +68,126 @@ ubuntu@ip-172-31-17-218:~$ # Welcome to your EC2 instance
 ## Usage
 
 ```
-$ awsops [--auth path/to/auth.json] <command> [options]
+$ awsops --help
+Usage: awsops <command> [options]
+
+Commands:
+  ls   List EC2 instances
+  ssh  SSH into an EC2 instance
+
+Options:
+  --auth            Optionally use a specified file for authentication
+  --id              Optionally filter by an EC2 instance ID
+  --name            Optionally filter by an EC2 instance's name
+  --only            Optionally return a comma-separated list of fields instead
+                    of rendering a table
+  --security-group  Optionally filter by a security group
+  --help            Show help                                          [boolean]
+  --verbose         Print info/debug statements                          [count]
+
+Examples:
+  awsops ls --security-group example-group
+  awsops ssh --name instance-name
+
+Got questions? Check out https://github.com/car-throttle/awsops/
 ```
+
+## `ls`
+
+```
+$ awsops ls [filters]
+```
+
+## `ssh`
+
+```
+$ awsops ssh [filters]
+```
+
+## Authentication
+
+Since this uses [`aws-sdk`](https://npm.im/aws-sdk/) behind the scenes, you can configure your own `~/.aws/credentials`
+file or load from environment variables [as described in the Amazon AWS-SDK Node-JS docs][aws-sdk-nodejs-docs]. Or you
+can load your own variables by passing a file to `--auth` like so:
+
+```
+$ awsops --auth ~/path/to/auth/file.json <command> [options]
+```
+
+You can pass a `.ini`, `.json`, `.js`, `.yml` file. Whichever format you prefer.
+
+### Example Config INI
+
+```ini
+[ec2]
+accessKeyId = XXXXXXXXXXXXXXXXXXXX
+secretAccessKey = YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+region = us-east-1
+
+[s3]
+accessKeyId = XXXXXXXXXXXXXXXXXXXX
+secretAccessKey = YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+
+[ssh]
+keys[prod-serv-key] = ~/src/aws/prod-serv-key.pem
+```
+
+### Example Config JSON
+
+```json
+{
+  "ec2": {
+    "accessKeyId": "XXXXXXXXXXXXXXXXXXXX",
+    "secretAccessKey": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
+    "region": "us-east-1"
+  },
+  "s3": {
+    "accessKeyId": "XXXXXXXXXXXXXXXXXXXX",
+    "secretAccessKey": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"
+  },
+  "ssh": {
+    "keys": {
+      "prod-serv-key": "~/src/aws/prod-serv-key.pem"
+    }
+  }
+}
+```
+
+### Example Config YAML
+
+```yml
+ec2:
+  accessKeyId: XXXXXXXXXXXXXXXXXXXX
+  secretAccessKey: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+  region: us-east-1
+s3:
+  accessKeyId: XXXXXXXXXXXXXXXXXXXX
+  secretAccessKey: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
+ssh:
+  keys:
+    prod-serv-key: ~/src/aws/prod-serv-key.pem
+```
+
+### Configuration Options
+
+| Key  | Description |
+| ---- | ---- |
+| `default` | Set the default AWS config (same as `AWS.config.update( ... )`) |
+| `ec2` | A config object used when creating `EC2` instances |
+| `s3` | A config object used when creating `S3` instances |
+| `ssh` | A config object used when invoking SSH connections |
+
+For `ec2` & `s3`, these are the same config objects that you'd pass when using the EC2/S3 objects in your own code.
+
+The SSH options available are:
+
+| Property | Description |
+| ---- | ---- |
+| `keys` | A key-value dictionary where you can define paths to your keys |
+| `user` | Optionally you can override the `username` field used in SSH connections (defaults to `ubuntu`) |
 
 ## Notes
 
 - Questions? Awesome! [Open an issue](https://github.com/car-throttle/awsops/issues/) to get started!
+
+[aws-sdk-nodejs-docs]: http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
