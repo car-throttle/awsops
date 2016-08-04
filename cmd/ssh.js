@@ -10,25 +10,25 @@ var util = require('util');
 module.exports = function (config, args, callback) {
   config = config || {};
 
+  var ssh_exec = args._.slice(1);
+  var ssh_opts = { config: config.ssh || {}, verbose: args.verbose };
+
   aws.lookupEc2Instances(config.ec2 || {}, _.pick(args, args.options), (err, instances) => {
     if (err) return callback(err);
     if (!Array.isArray(instances) || !instances.length) return next(new Error('No instances found'));
 
-    if (args._.slice(1).length) {
+    if (ssh_exec.length) {
       console.log(table(instances, [
         'InstanceId', 'Name', 'PublicIpAddress', 'PrivateIpAddress', 'LaunchTime', 'State'
       ]));
 
-      return async.eachSeries(instances, (instance, next) => sshToInstance(instance, {
-        config: config.ssh || {},
-        exec: args._.slice(1),
-        verbose: args.verbose
-      }, next), callback);
+      return async.eachSeries(instances, (instance, next) => sshToInstance(instance, Object.assign({ exec: ssh_exec },
+        ssh_opts), next), callback);
     }
 
     instances.forEach((i, v) => i.ID = '#' + (v + 1));
     console.log(table(instances, [ 'ID', 'InstanceId', 'Name', 'PublicIpAddress', 'LaunchTime', 'State' ]));
-    if (instances.length === 1 && instances[0]) return sshToInstance(instances[0], callback);
+    if (instances.length === 1 && instances[0]) return sshToInstance(instances[0], ssh_opts, callback);
 
     var rl = readline.createInterface(process.stdin, process.stdout);
     rl.question('[awsops] Which server would you like to connect to? [1..' + instances.length + '] ', (answer) => {
@@ -38,7 +38,7 @@ module.exports = function (config, args, callback) {
       var instance = instances[(parseInt(answer.trim(), 10) || 0) - 1];
       if (!instance) return callback(new Error('"' + answer + '" is not a valid server :('));
 
-      sshToInstance(instance, { config: config.ssh || {}, verbose: args.verbose }, callback);
+      sshToInstance(instance, ssh_opts, callback);
     });
   });
 };
