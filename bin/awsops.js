@@ -27,6 +27,7 @@ var yargs = require('yargs')
   .help('help')
   .count('verbose')
   .describe('verbose', 'Print info/debug statements')
+  .alias('v', 'verbose')
 
   .epilog('Got questions? Check out https://github.com/car-throttle/awsops/');
 
