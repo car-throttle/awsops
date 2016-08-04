@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 var yargs = require('yargs')
-  .usage('Usage: $0 <command>')
+  .usage('Usage: awsops <command> [options]')
   .demand(1)
 
   .command('ls', 'List EC2 instances')
-  .example('$0 ls --name instance-name')
+  .example('awsops ls --security-group example-group')
 
   .command('ssh', 'SSH into an EC2 instance')
-  .example('$0 ssh --name instance-name')
+  .example('awsops ssh --name instance-name')
 
   .describe('auth', 'Optionally use a specified file for authentication')
   .nargs('auth', 1)
@@ -18,15 +18,17 @@ var yargs = require('yargs')
   .describe('name', 'Optionally filter by an EC2 instance\'s name')
   .nargs('name', 1)
 
-  .describe('only', 'Optionally return a comma-seperated list of fields instead of rendering a table')
+  .describe('only', 'Optionally return a comma-separated list of fields instead of rendering a table')
   .nargs('only', 1)
 
   .describe('security-group', 'Optionally filter by a security group')
   .nargs('security-group', 1)
 
-  .alias('v', 'verbose')
+  .help('help')
   .count('verbose')
-  .epilog('Boop');
+  .describe('verbose', 'Print info/debug statements')
+
+  .epilog('Got questions? Check out https://github.com/car-throttle/awsops/');
 
 var args = yargs.argv;
 // Print the args if verbose enough
@@ -54,7 +56,7 @@ var cmd = args._[0];
 if (!cmd || !cmders.hasOwnProperty(cmd)) {
   console.error('[awsops] ERROR: Unknown command "%s"', cmd);
   yargs.showHelp();
-  process.exit(1);
+  return process.exit(1);
 }
 
 var conf = {};
