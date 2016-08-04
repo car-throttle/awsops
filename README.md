@@ -247,9 +247,9 @@ The SSH options available are:
 ## Notes
 
 - When logging into an instance with SSH, you'll notice the line
-  `Warning: Permanently added '54.185.61.256' (ECDSA) to the list of known hosts.` This is due to this script negating
+  `Warning: Permanently added '54.185.61.256' (ECDSA) to the list of known hosts`. This is due to this script negating
   the call to a valid known_hosts file in order to stop your known_hosts becoming overrun with the *hundreds* of EC2
-  instances that you're likely to see thanks to autoscaling.
+  instances that you're likely to see thanks to autoscaling. You'll see this every time, so don't panic :wink:
 - Questions? Awesome! [Open an issue](https://github.com/car-throttle/awsops/issues/) to get started!
 
 [aws-sdk-nodejs-docs]: http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
