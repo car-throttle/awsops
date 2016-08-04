@@ -92,7 +92,7 @@ Examples:
 Got questions? Check out https://github.com/car-throttle/awsops/
 ```
 
-## `ls`
+### `ls`
 
 ```
 $ awsops ls [filters]
@@ -126,7 +126,7 @@ ENDSSH
 done
 ```
 
-## `ssh`
+### `ssh`
 
 ```
 $ awsops ssh [filters] [-- [arguments]]
