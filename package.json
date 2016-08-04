@@ -1,7 +1,7 @@
 {
   "name": "awsops",
   "description": "Interaction with your AWS infrastructure",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "preferGlobal": true,
   "repository": {
     "type": "git",
@@ -26,7 +26,14 @@
   "author": "James D <james@jdrydn.com> (https://jdrydn.com)",
   "license": "MIT",
   "keywords": [
-    "aws", "amazon", "ec2", "s3", "ssh", "cli", "shell", "terminal"
+    "aws",
+    "amazon",
+    "ec2",
+    "s3",
+    "ssh",
+    "cli",
+    "shell",
+    "terminal"
   ],
   "dependencies": {
     "async": "^2.0.1",
