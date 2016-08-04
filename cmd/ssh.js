@@ -9,20 +9,19 @@ var util = require('util');
 
 module.exports = function (config, args, callback) {
   config = config || {};
-  var ssh_exec = args._.slice(1);
 
   aws.lookupEc2Instances(config.ec2 || {}, _.pick(args, args.options), (err, instances) => {
     if (err) return callback(err);
     if (!Array.isArray(instances) || !instances.length) return next(new Error('No instances found'));
 
-    if (ssh_exec.length) {
+    if (args._.slice(1).length) {
       console.log(table(instances, [
         'InstanceId', 'Name', 'PublicIpAddress', 'PrivateIpAddress', 'LaunchTime', 'State'
       ]));
 
       return async.eachSeries(instances, (instance, next) => sshToInstance(instance, {
         config: config.ssh || {},
-        exec: ssh_exec,
+        exec: args._.slice(1),
         verbose: args.verbose
       }, next), callback);
     }
@@ -39,7 +38,7 @@ module.exports = function (config, args, callback) {
       var instance = instances[(parseInt(answer.trim(), 10) || 0) - 1];
       if (!instance) return callback(new Error('"' + answer + '" is not a valid server :('));
 
-      sshToInstance(instance, callback);
+      sshToInstance(instance, { config: config.ssh || {}, verbose: args.verbose }, callback);
     });
   });
 };
