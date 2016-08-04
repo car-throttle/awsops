@@ -25,6 +25,9 @@
   ],
   "author": "James D <james@jdrydn.com> (https://jdrydn.com)",
   "license": "MIT",
+  "keywords": [
+    "aws", "amazon", "ec2", "s3", "ssh", "cli", "shell", "terminal"
+  ],
   "dependencies": {
     "async": "^2.0.1",
     "aws-sdk": "^2.4.12",
