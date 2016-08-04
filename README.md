@@ -98,10 +98,68 @@ Got questions? Check out https://github.com/car-throttle/awsops/
 $ awsops ls [filters]
 ```
 
+Lists your instances, after filtering using `--id`, `--name` or `--security-group`.
+
+You can also use `--only` to print an individual property of the instances, which can be useful in scripts. Here's an
+example of looping through a series of IPs during deployment:
+
+```
+$ awsops ls --name prod-serv --only PublicIpAddress
+54.185.61.256 107.24.256.132
+
+# In deploy.sh:
+PROD_SERVS=$(awsops ls --name prod-serv --only PublicIpAddress)
+if [ "$?" -ne "0" ]; then
+  echo "Failed to fetch the IPs for prod-serv"
+  exit 1
+fi
+
+COUNT=$(echo $PROD_SERVS | wc -w)
+echo "Deploying to $COUNT prod-serv instances"
+
+for IP in $PROD_SERVS; do
+  ssh ubuntu@$IP -i /path/to/instance_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null <<'ENDSSH'
+cd /var/app/my-application
+git pull
+pm2 restart all
+ENDSSH
+done
+```
+
 ## `ssh`
 
 ```
-$ awsops ssh [filters]
+$ awsops ssh [filters] [-- [arguments]]
+```
+
+Connect to your instances, after filtering using `--id`, `--name` or `--security-group`. You can either omit any
+arguments, which starts an interactive SSH session as you'd expect, or you can provide arguments to run a set of
+commands on each instance one after the other. For example, to check the status of a Node application on each instance
+using `pm2`:
+
+```
+$ awsops ssh --name prod-serv -- pm2 status
+┌────────────┬───────────┬─────────────────┬──────────────────┬──────────────┬─────────┐
+│ InstanceId │ Name      │ PublicIpAddress │ PrivateIpAddress │ LaunchTime   │ State   │
+├────────────┼───────────┼─────────────────┼──────────────────┼──────────────┼─────────┤
+│ i-218369c8 │ prod-serv │ 54.185.61.256   │ 172.30.17.218    │ 20 hours ago │ running │
+├────────────┼───────────┼─────────────────┼──────────────────┼──────────────┼─────────┤
+│ i-768fa4e6 │ prod-serv │ 107.24.256.132  │ 172.21.8.65      │ 20 hours ago │ running │
+└────────────┴───────────┴─────────────────┴──────────────────┴──────────────┴─────────┘
+[awsops] Connecting to prod-serv (i-218369c8) (with prod-serv-key) ...
+┌──────────────────────┬────┬─────────┬──────┬────────┬─────────┬────────┬──────────────┬──────────┐
+│ App name             │ id │ mode    │ pid  │ status │ restart │ uptime │ memory       │ watching │
+├──────────────────────┼────┼─────────┼──────┼────────┼─────────┼────────┼──────────────┼──────────┤
+│ prod-serv-production │ 0  │ cluster │ 6874 │ online │ 1       │ 71m    │ 242.832 MB   │ disabled │
+└──────────────────────┴────┴─────────┴──────┴────────┴─────────┴────────┴──────────────┴──────────┘
+ Use `pm2 show <id|name>` to get more details about an app
+[awsops] Connecting to prod-serv (i-768fa4e6) (with prod-serv-key) ...
+┌──────────────────────┬────┬─────────┬──────┬────────┬─────────┬────────┬──────────────┬──────────┐
+│ App name             │ id │ mode    │ pid  │ status │ restart │ uptime │ memory       │ watching │
+├──────────────────────┼────┼─────────┼──────┼────────┼─────────┼────────┼──────────────┼──────────┤
+│ prod-serv-production │ 0  │ cluster │ 6438 │ online │ 1       │ 70m    │ 454.000 MB   │ disabled │
+└──────────────────────┴────┴─────────┴──────┴────────┴─────────┴────────┴──────────────┴──────────┘
+ Use `pm2 show <id|name>` to get more details about an app
 ```
 
 ## Authentication
@@ -188,6 +246,10 @@ The SSH options available are:
 
 ## Notes
 
+- When logging into an instance with SSH, you'll notice the line
+  `Warning: Permanently added '54.185.61.256' (ECDSA) to the list of known hosts.` This is due to this script negating
+  the call to a valid known_hosts file in order to stop your known_hosts becoming overrun with the *hundreds* of EC2
+  instances that you're likely to see thanks to autoscaling.
 - Questions? Awesome! [Open an issue](https://github.com/car-throttle/awsops/issues/) to get started!
 
 [aws-sdk-nodejs-docs]: http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html
