@@ -1,14 +1,14 @@
 {
   "name": "awsops",
-  "version": "0.1.0",
   "description": "Interaction with your AWS infrastructure",
+  "version": "1.0.0",
   "private": true,
   "preferGlobal": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/car-throttle/awsops.git"
   },
-  "main": "index.js",
+  "main": "./lib/aws.js",
   "scripts": {
     "lint": "jshint .",
     "checkStyle": "jscs .",
@@ -16,13 +16,16 @@
     "posttest": "istanbul check-coverage",
     "test": "istanbul cover tests/runner.js"
   },
+  "bin": {
+    "awsops": "./bin/awsops.js"
+  },
   "files": [
     "bin",
     "cmd",
-    "lib",
-    "index.js"
+    "lib"
   ],
   "author": "James D <james@jdrydn.com> (https://jdrydn.com)",
+  "license": "MIT",
   "dependencies": {
     "async": "^2.0.1",
     "aws-sdk": "^2.4.12",
