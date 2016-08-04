@@ -1,0 +1,22 @@
+{
+  "eqeqeq": true,
+  "eqnull": true,
+  "-W018": true,
+  "-W030": true,
+  "node": true,
+  "asi": false,
+  "newcap": true,
+  "white": true,
+  "maxlen": 120,
+  "indent": 2,
+  "undef": true,
+  "unused": true,
+  "predef": [
+    "describe",
+    "it",
+    "before",
+    "beforeEach",
+    "after",
+    "afterEach"
+  ]
+}
