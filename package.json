@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Interaction with your AWS infrastructure",
   "private": true,
+  "preferGlobal": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/car-throttle/awsops.git"
