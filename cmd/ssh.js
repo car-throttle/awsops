@@ -15,7 +15,7 @@ module.exports = function (config, args, callback) {
 
   aws.lookupEc2Instances(config.ec2 || {}, _.pick(args, args.options), (err, instances) => {
     if (err) return callback(err);
-    if (!Array.isArray(instances) || !instances.length) return next(new Error('No instances found'));
+    if (!Array.isArray(instances) || !instances.length) return callback(new Error('No instances found'));
 
     if (ssh_exec.length) {
       console.log(table(instances, [
