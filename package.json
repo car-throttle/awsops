@@ -1,7 +1,7 @@
 {
   "name": "awsops",
   "description": "Interaction with your AWS infrastructure",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "preferGlobal": true,
   "repository": {
     "type": "git",
