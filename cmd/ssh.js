@@ -8,7 +8,8 @@ var table = require('../lib/table');
 var util = require('util');
 
 module.exports = function (config, args, callback) {
-  config = config || {};
+  args.options = [ 'id', 'name', 'security_group' ];
+  if (args['security-group']) args.security_group = args['security-group'];
 
   var ssh_exec = args._.slice(1);
   var ssh_opts = { config: config.ssh || {}, verbose: args.verbose };
