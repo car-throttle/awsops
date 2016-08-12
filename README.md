@@ -1,5 +1,7 @@
 # AWSOPS
 
+[![npm version](https://badge.fury.io/js/awsops.svg)](https://www.npmjs.com/package/awsops)
+
 `awsops` is a simplified CLI utility to help you interact with your AWS infrastructure.
 
 ## Installation
