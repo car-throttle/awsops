@@ -9,20 +9,28 @@ var yargs = require('yargs')
   .command('ssh', 'SSH into an EC2 instance')
   .example('awsops ssh --name instance-name')
 
+  .command('s3cp', 'SSH into an EC2 instance')
+  .example('awsops s3cp [from] [to]')
+
   .describe('auth', 'Optionally use a specified file for authentication')
   .nargs('auth', 1)
 
-  .describe('id', 'Optionally filter by an EC2 instance ID')
+  .describe('id', 'When using ls or ssh, optionally filter by an EC2 instance ID')
   .nargs('id', 1)
 
-  .describe('name', 'Optionally filter by an EC2 instance\'s name')
+  .describe('name', 'When using ls or ssh, optionally filter by an EC2 instance\'s name')
   .nargs('name', 1)
 
-  .describe('only', 'Optionally return a comma-separated list of fields instead of rendering a table')
+  .describe('only', 'When using ls or ssh, optionally return a comma-separated list of fields instead of rendering ' +
+    'a table')
   .nargs('only', 1)
 
-  .describe('security-group', 'Optionally filter by a security group')
+  .describe('security-group', 'When using ls or ssh, optionally filter by a security group')
   .nargs('security-group', 1)
+
+  .describe('quiet', 'When using s3cp, do not use the progress bar')
+  .boolean('quiet')
+  .alias('q', 'quiet')
 
   .help('help')
   .count('verbose')
@@ -67,9 +75,6 @@ if (args.auth) conf = config(path.resolve(args.auth));
 if (args.verbose >= 2) console.log('Config %j', conf);
 // If we set default credentials, then set them now
 if (conf.default) AWS.config.update(conf.default);
-
-args.options = [ 'id', 'name', 'security_group' ];
-if (args['security-group']) args.security_group = args['security-group'];
 
 // Run the command, passing it our credentials & arguments
 cmders[cmd].call(null, conf, args, function (err, meta) {
