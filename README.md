@@ -72,22 +72,24 @@ $ awsops --help
 Usage: awsops <command> [options]
 
 Commands:
-  ls   List EC2 instances
-  ssh  SSH into an EC2 instance
+  ls    List EC2 instances
+  ssh   SSH into an EC2 instance
+  s3cp  Download/upload a file from/to an S3 bucket
 
 Options:
   --auth            Optionally use a specified file for authentication
-  --id              Optionally filter by an EC2 instance ID
-  --name            Optionally filter by an EC2 instance's name
-  --only            Optionally return a comma-separated list of fields instead
-                    of rendering a table
-  --security-group  Optionally filter by a security group
+  --id              When using ls or ssh, optionally filter by an EC2 instance ID
+  --name            When using ls or ssh, optionally filter by an EC2 instance's name
+  --only            When using ls or ssh, optionally return a comma-separated list of fields instead of rendering a table
+  --security-group  When using ls or ssh, optionally filter by a security group
   --help            Show help                                          [boolean]
-  --verbose         Print info/debug statements                          [count]
+  -q, --quiet       When using s3cp, do not use the progress bar       [boolean]
+  -v, --verbose     Print info/debug statements                          [count]
 
 Examples:
   awsops ls --security-group example-group
   awsops ssh --name instance-name
+  awsops s3cp archive.tar.gz s3://my-archive-bucket/archive-2016-08-12.tar.gz
 
 Got questions? Check out https://github.com/car-throttle/awsops/
 ```
@@ -160,6 +162,26 @@ $ awsops ssh --name prod-serv -- pm2 status
 │ prod-serv-production │ 0  │ cluster │ 6438 │ online │ 1       │ 70m    │ 454.000 MB   │ disabled │
 └──────────────────────┴────┴─────────┴──────┴────────┴─────────┴────────┴──────────────┴──────────┘
  Use `pm2 show <id|name>` to get more details about an app
+```
+
+### `s3cp`
+
+```
+$ awsops s3cp [from] [to]
+```
+
+Download from, or upload to, an S3 bucket of your choice. There are a few shortcuts to make it easier to download/upload
+files in quick succession:
+
+```
+awsops s3cp s3://bucket/path/to/s3-item.txt
+  => Download to CURRENT_WORKING_DIRECTORY/s3-item.txt
+awsops s3cp s3://bucket/path/to/s3-item.txt folder/something.txt
+  => Download to CURRENT_WORKING_DIRECTORY/folder/something.txt
+awsops s3cp file.txt s3://bucket/
+  => Upload file.txt to s3://bucket/file.txt
+awsops s3cp file.txt s3://bucket/somefile.txt
+  => Upload file.txt to s3://bucket/somefile.txt
 ```
 
 ## Authentication
