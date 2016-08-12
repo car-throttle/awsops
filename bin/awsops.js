@@ -9,8 +9,8 @@ var yargs = require('yargs')
   .command('ssh', 'SSH into an EC2 instance')
   .example('awsops ssh --name instance-name')
 
-  .command('s3cp', 'SSH into an EC2 instance')
-  .example('awsops s3cp [from] [to]')
+  .command('s3cp', 'Download/upload a file from/to an S3 bucket')
+  .example('awsops s3cp archive.tar.gz s3://my-archive-bucket/archive-2016-08-12.tar.gz')
 
   .describe('auth', 'Optionally use a specified file for authentication')
   .nargs('auth', 1)
