@@ -12,9 +12,13 @@ module.exports = function (config, args, callback) {
   if (args['security-group']) args.security_group = args['security-group'];
 
   var ssh_exec = args._.slice(1);
-  var ssh_opts = { config: config.ssh || {}, verbose: args.verbose };
+  var ssh_opts = {
+    config: config.ssh || {},
+    user: args.user,
+    verbose: args.verbose
+  };
 
-  aws.lookupEc2Instances(config.ec2 || {}, _.pick(args, args.options), (err, instances) => {
+  aws.lookupEc2Instances(config.ec2 || {}, _.pick(args, args.options), function (err, instances) {
     if (err) return callback(err);
     if (!Array.isArray(instances) || !instances.length) return callback(new Error('No instances found'));
 
@@ -23,16 +27,19 @@ module.exports = function (config, args, callback) {
         'InstanceId', 'Name', 'PublicIpAddress', 'PrivateIpAddress', 'LaunchTime', 'State'
       ]));
 
-      return async.eachSeries(instances, (instance, next) => sshToInstance(instance, Object.assign({ exec: ssh_exec },
-        ssh_opts), next), callback);
+      return async.eachSeries(instances, function (instance, next) {
+        sshToInstance(instance, Object.assign({ exec: ssh_exec }, ssh_opts), next);
+      }, callback);
     }
 
-    instances.forEach((i, v) => i.ID = '#' + (v + 1));
+    instances.forEach(function (i, v) {
+      i.ID = '#' + (v + 1);
+    });
     console.log(table(instances, [ 'ID', 'InstanceId', 'Name', 'PublicIpAddress', 'LaunchTime', 'State' ]));
     if (instances.length === 1 && instances[0]) return sshToInstance(instances[0], ssh_opts, callback);
 
     var rl = readline.createInterface(process.stdin, process.stdout);
-    rl.question('[awsops] Which server would you like to connect to? [1..' + instances.length + '] ', (answer) => {
+    rl.question('[awsops] Server to connect to? [1..' + instances.length + '] ', function (answer) {
       rl.close();
       if (answer.trim().length === 0) return callback(new Error('You didn\'t select a server :('));
 
@@ -62,7 +69,7 @@ var sshToInstance = function (instance, opts, callback) {
   console.log('[awsops] Connecting to %s (%s) (with %s) ...', instance.Name, instance.InstanceId, instance.KeyName);
   var ssh_args = [];
 
-  ssh_args.push(util.format('%s@%s', opts.config.user || 'ubuntu', instance.PublicIpAddress));
+  ssh_args.push(util.format('%s@%s', opts.config.user || opts.user || 'ubuntu', instance.PublicIpAddress));
   ssh_args.push('-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null');
   if (instance.KeyName) {
     if (!opts.config.keys || !opts.config.keys.hasOwnProperty(instance.KeyName)) ssh_args.push('-i', instance.KeyName);
@@ -73,5 +80,5 @@ var sshToInstance = function (instance, opts, callback) {
   if (opts.verbose >= 1) console.log('ssh', ssh_args.join(' '));
 
   var ssh = spawn('ssh', ssh_args, { stdio: 'inherit' });
-  ssh.on('close', () => callback());
+  ssh.on('close', callback);
 };

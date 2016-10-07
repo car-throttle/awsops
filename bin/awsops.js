@@ -21,8 +21,7 @@ var yargs = require('yargs')
   .describe('name', 'When using ls or ssh, optionally filter by an EC2 instance\'s name')
   .nargs('name', 1)
 
-  .describe('only', 'When using ls or ssh, optionally return a comma-separated list of fields instead of rendering ' +
-    'a table')
+  .describe('only', 'When using ls or ssh, optionally return a comma-separated list of fields instead of rendering a table') // jshint ignore: line
   .nargs('only', 1)
 
   .describe('security-group', 'When using ls or ssh, optionally filter by a security group')
@@ -31,6 +30,9 @@ var yargs = require('yargs')
   .describe('quiet', 'When using s3cp, do not use the progress bar')
   .boolean('quiet')
   .alias('q', 'quiet')
+
+  .describe('user', 'When using ssh, optionally set the user to login as')
+  .nargs('user', 1)
 
   .help('help')
   .count('verbose')
