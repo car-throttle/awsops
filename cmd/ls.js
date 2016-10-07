@@ -10,7 +10,9 @@ module.exports = function (config, args, callback) {
     if (err) return callback(err);
 
     if (_.isString(args.only)) {
-      console.log(_.map(instances, args.only).filter((value) => value && value.length).join(' '));
+      console.log(_.map(instances, args.only).filter(function (value) {
+        return value && value.length;
+      }).join(' '));
     }
     else {
       console.log(table(instances, [

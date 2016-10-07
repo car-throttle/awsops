@@ -20,13 +20,15 @@ module.exports = function (config, args, callback) {
   if (s3cp_args.length !== 2) return callback(new Error('You need two arguments: [src] & [dest]'));
 
   var fn = null;
+  var s3src = null;
+
   if (s3cp_args[0].indexOf('s3://') === 0 && s3cp_args[1].indexOf('s3://') === 0) {
     // Duplicating on S3: copyObject
     return callback(new Error('Both arguments are s3-bound, copying between S3 isn\'t supported (yet)!'));
   }
   else if (s3cp_args[0].indexOf('s3://') === 0 && s3cp_args[1].indexOf('s3://') !== 0) {
     // Downloading from S3: downloadFileFromS3
-    var s3src = parseS3url(s3cp_args[0]);
+    s3src = parseS3url(s3cp_args[0]);
     if (!s3cp_args[1]) s3cp_args[1] = path.basename(s3src.path);
 
     fn = aws.downloadFileFromS3.bind(aws, config.s3 || {}, {
@@ -38,7 +40,7 @@ module.exports = function (config, args, callback) {
   }
   else if (s3cp_args[0].indexOf('s3://') !== 0 && s3cp_args[1].indexOf('s3://') === 0) {
     // Uploading to S3: uploadFileToS3
-    var s3src = parseS3url(s3cp_args[1]);
+    s3src = parseS3url(s3cp_args[1]);
     if (!s3src.path) s3src.path = path.basename(s3cp_args[0]);
 
     fn = aws.uploadFileToS3.bind(aws, config.s3 || {}, {
