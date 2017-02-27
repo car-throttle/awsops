@@ -18,6 +18,9 @@ module.exports = function (config, args, callback) {
     verbose: args.verbose
   };
 
+  var lookupArgs = _.pick(args, [ 'id', 'name', 'security_group' ]);
+  lookupArgs.state = 'running';
+
   aws.lookupEc2Instances(config.ec2 || {}, _.pick(args, args.options), function (err, instances) {
     if (err) return callback(err);
     if (!Array.isArray(instances) || !instances.length) return callback(new Error('No instances found'));
@@ -71,6 +74,10 @@ var sshToInstance = function (instance, opts, callback) {
 
   ssh_args.push(util.format('%s@%s', opts.config.user || opts.user || 'ubuntu', instance.PublicIpAddress));
   ssh_args.push('-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null');
+
+  // Add a ProxyCommand if required
+  if (opts.config.proxycommand) ssh_args.push('-o', 'ProxyCommand="' + opts.config.proxycommand + '"');
+
   if (instance.KeyName) {
     if (!opts.config.keys || !opts.config.keys.hasOwnProperty(instance.KeyName)) ssh_args.push('-i', instance.KeyName);
     else ssh_args.push('-i', module.exports.formatKeyPath(opts.config.keys[instance.KeyName]));
@@ -79,6 +86,6 @@ var sshToInstance = function (instance, opts, callback) {
   if (Array.isArray(opts.exec) && opts.exec.length) ssh_args = ssh_args.concat([ '-q', '--' ], opts.exec);
   if (opts.verbose >= 1) console.log('ssh', ssh_args.join(' '));
 
-  var ssh = spawn('ssh', ssh_args, { stdio: 'inherit' });
+  var ssh = spawn('/bin/sh', [ '-c', 'ssh ' + ssh_args.join(' ') ], { stdio: 'inherit' });
   ssh.on('close', callback);
 };

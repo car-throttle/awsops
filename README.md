@@ -238,6 +238,9 @@ keys[prod-serv-key] = ~/src/aws/prod-serv-key.pem
 ### Example Config YAML
 
 ```yml
+aws:
+  profile: someimportantcompany
+  region: eu-west-2
 ec2:
   accessKeyId: XXXXXXXXXXXXXXXXXXXX
   secretAccessKey: YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY
@@ -248,25 +251,34 @@ s3:
 ssh:
   keys:
     prod-serv-key: ~/src/aws/prod-serv-key.pem
+  # proxycommand: 'ssh vpn.someimportantcompany.com nc %h %p 2> /dev/null' # Optionally, if you want to proxy the SSH commands
 ```
 
 ### Configuration Options
 
 | Key  | Description |
 | ---- | ---- |
-| `default` | Set the default AWS config (same as `AWS.config.update( ... )`) |
-| `ec2` | A config object used when creating `EC2` instances |
-| `s3` | A config object used when creating `S3` instances |
+| `aws` | A config object for globally configuring AWS SDK instances |
+| `ec2` | A config object used when creating `EC2` SDK instances |
+| `s3` | A config object used when creating `S3` SDK instances |
 | `ssh` | A config object used when invoking SSH connections |
 
 For `ec2` & `s3`, these are the same config objects that you'd pass when using the EC2/S3 objects in your own code.
 
-The SSH options available are:
+The `aws` options available are:
+
+| Property | Description |
+| ---- | ---- |
+| `profile` | Optionally set the AWS profile used from the shared credentials file |
+| `region` | If you're not using either `ec2` or `s3` then you must specify a region here |
+
+The `ssh` options available are:
 
 | Property | Description |
 | ---- | ---- |
 | `keys` | A key-value dictionary where you can define paths to your keys |
 | `user` | Optionally you can override the `username` field used in SSH connections (defaults to `ubuntu`) |
+| `proxycommand` | If you want to proxy your SSH commands, enter your `ProxyCommand` here |
 
 ## Notes
 

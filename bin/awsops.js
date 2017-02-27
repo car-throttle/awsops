@@ -15,6 +15,12 @@ var yargs = require('yargs')
   .describe('auth', 'Optionally use a specified file for authentication')
   .nargs('auth', 1)
 
+  .describe('profile', 'Optionally use a specified profile from the shared credentials file')
+  .nargs('profile', 1)
+
+  .describe('region', 'Optionally force a region')
+  .nargs('region', 1)
+
   .describe('id', 'When using ls or ssh, optionally filter by an EC2 instance ID')
   .nargs('id', 1)
 
@@ -75,8 +81,14 @@ var conf = {};
 if (args.auth) conf = config(path.resolve(args.auth));
 // Print the auth file contents if verbose enough
 if (args.verbose >= 2) console.log('Config %j', conf);
-// If we set default credentials, then set them now
-if (conf.default) AWS.config.update(conf.default);
+
+// Set the AWS profile for this run
+if (args.profile) AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: args.profile });
+else if (conf.aws && conf.aws.profile) AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: conf.aws.profile }); // jshint maxlen: false
+
+// Set the region for this run
+if (args.region) AWS.config.update({ region: args.region });
+else if (conf.aws && conf.aws.region) AWS.config.update({ region: conf.aws.region });
 
 // Run the command, passing it our credentials & arguments
 cmders[cmd].call(null, conf, args, function (err, meta) {
